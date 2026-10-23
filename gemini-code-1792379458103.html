@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional English & Khmer Typing Trainer</title>
+    <style>
+        :root {
+            --primary-blue: #2563eb;
+            --primary-hover: #1d4ed8;
+            --correct-blue: #1d4ed8;
+            --correct-bg: #dbeafe;
+            --error-red: #dc2626;
+            --error-bg: #fee2e2;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --key-active: #2563eb;
+        }
+
+        body {
+            font-family: 'Khmer OS Battambang', 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-blue);
+            margin-bottom: 5px;
+            font-size: 26px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        label { font-weight: 600; font-size: 14px; }
+
+        select, button {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            outline: none;
+        }
+
+        button.btn-primary {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        button.btn-primary:hover { background-color: var(--primary-hover); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        /* TEXT DISPLAY AREA */
+        .text-display-box {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 22px;
+            font-size: 24px;
+            line-height: 2.2;
+            min-height: 110px;
+            max-height: 180px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            user-select: none;
+            font-family: 'Khmer OS Battambang', 'Segoe UI', monospace;
+            word-break: break-word;
+        }
+
+        .word {
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            padding: 3px 6px;
+            color: var(--text-muted);
+            transition: all 0.15s ease;
+        }
+
+        .word.correct {
+            color: var(--correct-blue);
+            background-color: var(--correct-bg);
+            font-weight: 600;
+        }
+
+        .word.incorrect {
+            color: var(--error-red);
+            background-color: var(--error-bg);
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        .word.current {
+            background-color: #e0f2fe;
+            border-bottom: 3px solid var(--primary-blue);
+            color: #0f172a;
+        }
+
+        textarea.input-box {
+            width: 100%;
+            height: 90px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 20px;
+            resize: none;
+            outline: none;
+            font-family: 'Khmer OS Battambang', inherit;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        textarea.input-box:focus { border-color: var(--primary-blue); }
+
+        /* SHORTCUT BANNER */
+        .key-hint-banner {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 14px 18px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            color: #1d4ed8;
+            margin-bottom: 15px;
+            font-size: 17px;
+        }
+
+        .key-badge {
+            background: #2563eb;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 16px;
+            margin: 0 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* KEYBOARD CONTAINER */
+        .keyboard-container {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .kb-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .key {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-bottom: 3px solid #94a3b8;
+            border-radius: 5px;
+            min-width: 42px;
+            height: 42px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #334155;
+            box-sizing: border-box;
+            transition: all 0.1s ease;
+        }
+
+        .key.active-target {
+            background-color: var(--key-active) !important;
+            color: white !important;
+            border-color: #1d4ed8 !important;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .key.active-shift {
+            background-color: #f59e0b !important;
+            color: white !important;
+            border-color: #d97706 !important;
+        }
+
+        .key-wide { min-width: 70px; }
+        .key-space { min-width: 250px; }
+
+        .results-summary {
+            display: none;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Professional Khmer & English Typing Trainer</h1>
+    <div class="subtitle">Structured Practice & Real-Time Student Progress Tracking</div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="langSelect">Language:</label>
+            <select id="langSelect" onchange="initTest()">
+                <option value="khmer">Khmer (ភាសាខ្មែរ)</option>
+                <option value="english">English</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="diffSelect">Level:</label>
+            <select id="diffSelect" onchange="initTest()">
+                <option value="beginner">Beginner / Home Row</option>
+                <option value="intermediate">Intermediate Sentences</option>
+                <option value="advanced">Advanced Paragraph</option>
+            </select>
+        </div>
+        <button class="btn-primary" onclick="initTest()">Restart Practice</button>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">WPM</div><div class="stat-value" id="wpmDisplay">0</div></div>
+        <div class="stat-card"><div class="stat-label">Accuracy</div><div class="stat-value" id="accDisplay">100%</div></div>
+        <div class="stat-card"><div class="stat-label">Errors</div><div class="stat-value" id="errDisplay">0</div></div>
+        <div class="stat-card"><div class="stat-label">Time</div><div class="stat-value" id="timeDisplay">0s</div></div>
+    </div>
+
+    <div class="text-display-box" id="textDisplay"></div>
+
+    <textarea id="inputBox" class="input-box" placeholder="ចុចទីនេះដើម្បីចាប់ផ្តើមវាយអត្ថបទ..." oninput="handleTyping()" disabled></textarea>
+
+    <!-- SHORTCUT BANNER -->
+    <div class="key-hint-banner" id="keyHintBanner">
+        Current Target: <span id="hintKeyText">-</span>
+    </div>
+
+    <!-- ON-SCREEN KEYBOARD -->
+    <div class="keyboard-container" id="keyboard">
+        <div class="kb-row">
+            <div class="key" data-key="`">`</div><div class="key" data-key="1">1</div><div class="key" data-key="2">2</div><div class="key" data-key="3">3</div><div class="key" data-key="4">4</div><div class="key" data-key="5">5</div><div class="key" data-key="6">6</div><div class="key" data-key="7">7</div><div class="key" data-key="8">8</div><div class="key" data-key="9">9</div><div class="key" data-key="0">0</div><div class="key" data-key="-">-</div><div class="key" data-key="=">=</div>
+        </div>
+        <div class="kb-row">
+            <div class="key" data-key="q">Q</div><div class="key" data-key="w">W</div><div class="key" data-key="e">E</div><div class="key" data-key="r">R</div><div class="key" data-key="t">T</div><div class="key" data-key="y">Y</div><div class="key" data-key="u">U</div><div class="key" data-key="i">I</div><div class="key" data-key="o">O</div><div class="key" data-key="p">P</div><div class="key" data-key="[">[</div><div class="key" data-key="]">]</div>
+        </div>
+        <div class="kb-row">
+            <div class="key" data-key="a">A</div><div class="key" data-key="s">S</div><div class="key" data-key="d">D</div><div class="key" data-key="f">F</div><div class="key" data-key="g">G</div><div class="key" data-key="h">H</div><div class="key" data-key="j">J</div><div class="key" data-key="k">K</div><div class="key" data-key="l">L</div><div class="key" data-key=";">;</div><div class="key" data-key="'">'</div>
+        </div>
+        <div class="kb-row">
+            <div class="key key-wide" id="key-shift" data-key="shift">Shift</div><div class="key" data-key="z">Z</div><div class="key" data-key="x">X</div><div class="key" data-key="c">C</div><div class="key" data-key="v">V</div><div class="key" data-key="b">B</div><div class="key" data-key="n">N</div><div class="key" data-key="m">M</div><div class="key" data-key=",">,</div><div class="key" data-key=".">.</div><div class="key" data-key="/">/</div>
+        </div>
+        <div class="kb-row">
+            <div class="key key-space" data-key=" ">Space bar</div>
+        </div>
+    </div>
+
+    <div class="results-summary" id="resultsBox">
+        <h3>Practice Completed! 🎉</h3>
+        <p id="finalStatsText"></p>
+        <button class="btn-primary" onclick="initTest()">Try Again</button>
+    </div>
+</div>
+
+<script>
+    const khmerKeyMap = {
+        'ក': { key: 'k', shift: false }, 'ខ': { key: 'x', shift: false }, 'គ': { key: 'c', shift: false },
+        'ឃ': { key: 'k', shift: true },  'ង': { key: 'o', shift: false }, 'ច': { key: 'c', shift: false },
+        'ឆ': { key: 'c', shift: true },  'ជ': { key: 'j', shift: false }, 'ឈ': { key: 'j', shift: true },
+        'ញ': { key: 'j', shift: true },  'ដ': { key: 'd', shift: false }, 'ឋ': { key: 'z', shift: false },
+        'ឌ': { key: 'd', shift: true },  'ឍ': { key: 'z', shift: true },  'ណ': { key: 'n', shift: true },
+        'ត': { key: 't', shift: false }, 'ថ': { key: 'f', shift: false }, 'ទ': { key: 't', shift: false },
+        'ធ': { key: 't', shift: true },  'ន': { key: 'n', shift: false }, 'ប': { key: 'b', shift: false },
+        'ផ': { key: 'p', shift: false }, 'ព': { key: 'b', shift: false }, 'ភ': { key: 'p', shift: true },
+        'ម': { key: 'm', shift: false }, 'យ': { key: 'y', shift: false }, 'រ': { key: 'r', shift: false },
+        'ល': { key: 'l', shift: false }, 'វ': { key: 'v', shift: false }, 'ស': { key: 's', shift: false },
+        'ហ': { key: 'h', shift: false }, 'ឡ': { key: 'l', shift: true },  'អ': { key: 'a', shift: false },
+        'ា': { key: 'a', shift: false }, 'ិ': { key: 'i', shift: false }, 'ី': { key: 'i', shift: true },
+        'ឹ': { key: 'w', shift: false }, 'ឺ': { key: 'w', shift: true },  'ុ': { key: 'u', shift: false },
+        'ូ': { key: 'u', shift: true },  'ួ': { key: 'y', shift: true },  'ើ': { key: 'e', shift: false },
+        'ឿ': { key: 'e', shift: true },  'ៀ': { key: 'e', shift: false }, 'េ': { key: 'e', shift: false },
+        'ែ': { key: 'e', shift: true },  'ៃ': { key: 's', shift: true },  'ោ': { key: 'o', shift: false },
+        'ៅ': { key: 'o', shift: true },  'ំ': { key: 'm', shift: true },  'ះ': { key: 'h', shift: true },
+        'ៈ': { key: 'r', shift: true },  '៉': { key: 'x', shift: true },  '៊': { key: '`', shift: true },
+        '់': { key: 'b', shift: true },  '៏': { key: 'n', shift: true },  '៌': { key: 'a', shift: true },
+        '៍': { key: 'u', shift: true },  '័': { key: 'f', shift: true },  '្': { key: 'j', shift: false }
+    };
+
+    const texts = {
+        english: {
+            beginner: "asdf jkl; asdf jkl; qwer uiop zxcv mnbd a s d f j k l ;",
+            intermediate: "The quick brown fox jumps over the lazy dog. Practice makes perfect when learning touch typing every single day.",
+            advanced: "Information technology networking requires precision, patience, and continuous practice. Configuring Cisco switches and routers ensures secure communication across enterprise data centers."
+        },
+        khmer: {
+            beginner: "ក ខ គ ឃ ង ច ឆ ជ ឈ ញ ដ ឋ ឌ ឍ ណ ត ថ ទ ធ ន ប ផ ព ភ ម",
+            intermediate: "ការអនុវត្ត ការវាយអត្ថបទ ជាភាសាខ្មែរ ជួយឱ្យអ្នកមាន ល្បឿនលឿន និងភាពត្រឹមត្រូវ ខ្ពស់ក្នុងការងារ រដ្ឋបាល។",
+            advanced: "ព្រះរាជាណាចក្រកម្ពុជា មានប្រវត្តិសាស្ត្រ ដ៏យូរលង់ និងវប្បធម៌ ដ៏សម្បូរបែប។ ការអភិវឌ្ឍ បច្ចេកវិទ្យាព័ត៌មាន ទាមទារធនធានមនុស្ស ដែលមានជំនាញ ច្បាស់លាស់។"
+        }
+    };
+
+    let targetWords = [], startTime = null, timerInterval = null, totalErrors = 0, isFinished = false;
+
+    function initTest() {
+        const lang = document.getElementById("langSelect").value;
+        const diff = document.getElementById("diffSelect").value;
+        const rawText = texts[lang][diff];
+        targetWords = rawText.split(" ");
+        
+        const textDisplay = document.getElementById("textDisplay");
+        textDisplay.innerHTML = "";
+        
+        targetWords.forEach((word, idx) => {
+            const span = document.createElement("span");
+            span.className = "word" + (idx === 0 ? " current" : "");
+            span.innerText = word;
+            textDisplay.appendChild(span);
+        });
+
+        const inputBox = document.getElementById("inputBox");
+        inputBox.value = ""; inputBox.disabled = false; inputBox.focus();
+        
+        if (lang === 'khmer') {
+            inputBox.placeholder = "ចុចទីនេះដើម្បីចាប់ផ្តើមវាយអត្ថបទ...";
+        } else {
+            inputBox.placeholder = "Click here and start typing...";
+        }
+
+        document.getElementById("resultsBox").style.display = "none";
+        clearInterval(timerInterval); startTime = null; totalErrors = 0; isFinished = false;
+        
+        document.getElementById("wpmDisplay").innerText = "0";
+        document.getElementById("accDisplay").innerText = "100%";
+        document.getElementById("errDisplay").innerText = "0";
+        document.getElementById("timeDisplay").innerText = "0s";
+
+        updateShortcutGuide(0);
+    }
+
+    function updateShortcutGuide(wordIdx) {
+        document.querySelectorAll(".key").forEach(k => k.classList.remove("active-target", "active-shift"));
+
+        if (wordIdx >= targetWords.length) return;
+
+        const currentWord = targetWords[wordIdx];
+        const lang = document.getElementById("langSelect").value;
+        const firstChar = currentWord[0];
+
+        let keyToPress = firstChar.toLowerCase();
+        let needsShift = firstChar !== firstChar.toLowerCase() && firstChar !== ' ';
+
+        if (lang === 'khmer') {
+            const map = khmerKeyMap[firstChar];
+            if (map) {
+                keyToPress = map.key;
+                needsShift = map.shift;
+            }
+        }
+
+        const hintBox = document.getElementById("hintKeyText");
+        hintBox.innerHTML = `Target Word: <strong>${currentWord}</strong> | Key: <span class="key-badge">${needsShift ? 'Shift + ' : ''}${keyToPress.toUpperCase()}</span>`;
+
+        const keyEl = document.querySelector(`.key[data-key="${keyToPress}"]`);
+        if (keyEl) keyEl.classList.add("active-target");
+        if (needsShift) {
+            const shiftEl = document.getElementById("key-shift");
+            if (shiftEl) shiftEl.classList.add("active-shift");
+        }
+    }
+
+    function handleTyping() {
+        if (!startTime && !isFinished) {
+            startTime = new Date();
+            timerInterval = setInterval(() => {
+                document.getElementById("timeDisplay").innerText = Math.round((new Date() - startTime) / 1000) + "s";
+            }, 1000);
+        }
+
+        const inputVal = document.getElementById("inputBox").value;
+        const inputWords = inputVal.trim().split(/\s+/);
+        const wordSpans = document.getElementById("textDisplay").querySelectorAll(".word");
+        
+        let errors = 0;
+        let currentWordIndex = inputVal.endsWith(" ") ? inputWords.length : inputWords.length - 1;
+
+        wordSpans.forEach((span, i) => {
+            span.className = "word";
+            if (i < currentWordIndex) {
+                if (inputWords[i] === targetWords[i]) {
+                    span.classList.0 = "";
+                    span.classList.add("word", "correct");
+                } else {
+                    span.classList.add("word", "incorrect");
+                    errors++;
+                }
+            } else if (i === currentWordIndex) {
+                span.classList.add("word", "current");
+            }
+        });
+
+        totalErrors = errors;
+        document.getElementById("errDisplay").innerText = totalErrors;
+
+        const totalCharsTyped = inputVal.length;
+        const acc = totalCharsTyped > 0 ? Math.max(0, Math.round(((totalCharsTyped - (errors * 4)) / totalCharsTyped) * 100)) : 100;
+        document.getElementById("accDisplay").innerText = acc + "%";
+
+        if (startTime && totalCharsTyped > 0) {
+            const mins = (new Date() - startTime) / 60000;
+            if (mins > 0) document.getElementById("wpmDisplay").innerText = Math.max(0, Math.round((totalCharsTyped / 5) / mins));
+        }
+
+        updateShortcutGuide(currentWordIndex);
+
+        if (currentWordIndex >= targetWords.length && !isFinished) {
+            isFinished = true; clearInterval(timerInterval);
+            document.getElementById("inputBox").disabled = true;
+            document.getElementById("finalStatsText").innerHTML = `Speed: <strong>${document.getElementById("wpmDisplay").innerText} WPM</strong> | Accuracy: <strong>${acc}%</strong><br><br><em>Copy your results into your Student Tracking Sheet!</em>`;
+            document.getElementById("resultsBox").style.display = "block";
+        }
+    }
+
+    window.onload = initTest;
+</script>
+
+</body>
+</html>
